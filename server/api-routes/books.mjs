@@ -1,0 +1,41 @@
+import express from "express";
+import env from "dotenv";
+import { body } from "express-validator";
+import {
+  deleteBook,
+  getAllBooks,
+  getBookById,
+  registerBook,
+  updateBook,
+} from "../controllers/bookControl.mjs";
+import requestErrorHandler from "../helpers/helper.mjs";
+
+env.config();
+
+const router = express.Router();
+
+router.get("/", requestErrorHandler(getAllBooks));
+
+router.get("/:id", requestErrorHandler(getBookById));
+
+router.post(
+  "/",
+  body("title").notEmpty(),
+  body("description").notEmpty(),
+  body("comment").notEmpty(),
+  body("rating").notEmpty().isInt({ min: 1, max: 5 }),
+  requestErrorHandler(registerBook)
+);
+
+router.patch(
+  "/:id",
+  body("title").optional().notEmpty(),
+  body("description").optional().notEmpty(),
+  body("comment").optional().notEmpty(),
+  body("rating").optional().notEmpty().isInt({ min: 1, max: 5 }),
+  requestErrorHandler(updateBook)
+);
+
+router.delete("/:id", requestErrorHandler(deleteBook));
+
+export default router;
